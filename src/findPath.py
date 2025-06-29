@@ -12,7 +12,7 @@ class State:
         self.board_height = board_height
         self.operations = operations or []  # 操作履歴（コピー対応）
         self.visited_friends = visited_friends or [[False] * len(board_height[0]) for _ in range(len(board_height))]
-        
+
     def __eq__(self, other):
         return isinstance(other, State) and (
             self.pos.y == other.pos.y and
@@ -26,7 +26,8 @@ class State:
             self.pos.y,
             self.pos.x,
             tuple(tuple(row) for row in self.board_type),
-            tuple(tuple(row) for row in self.board_height)
+            tuple(tuple(row) for row in self.board_height),
+            tuple(tuple(row) for row in self.visited_friends)
         ))
 
 
