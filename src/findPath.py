@@ -83,18 +83,32 @@ def findPath(board_type, board_height):
         # 全ての友達の元に行ったら終了
         if check_all_friends(nowstate):
             return nowstate.operations
+        
+        nowpos = nowstate.pos
 
         for d in range(4):
             nextstate = nowstate.copy()
+            max_next_height = nextstate.board_height[nextstate.pos.y][nextstate.pos.x]
 
-            if nextstate.board_type[nextstate.pos.y][nextstate.pos.x] in ['1', '3', 'd', 'e', 'f', 'g', 'h', 'i', 'w']:
-                nextstate.pos.y = nowstate.pos.y + dy[d]
-                nextstate.pos.x = nowstate.pos.x + dx[d]
+            if nextstate.board_type[nowpos.y][nowpos.x] in ['1', '3', '7', 'd', 'e', 'f', 'g', 'h', 'i', 'w']:
+                nextstate.pos.y = nowpos.y + dy[d]
+                nextstate.pos.x = nowpos.x + dx[d]
+
+            if nextstate.board_type[nowpos.y][nowpos.x] in ['7']:
+                if 0 <= nextstate.pos.y < height and 0 <= nextstate.pos.x < width:
+                    if nextstate.board_height[nextstate.pos.y][nextstate.pos.x] <= nextstate.board_height[nowpos.y][nowpos.x]:
+                        nextstate.pos.y = nextstate.pos.y + dy[d]
+                        nextstate.pos.x = nextstate.pos.x + dx[d]
+                    else:
+                        max_next_height += 1
 
             if nextstate.pos.y < 0 or nextstate.pos.y >= height or nextstate.pos.x < 0 or nextstate.pos.x >= width:
                 continue
 
             if nextstate.board_type[nextstate.pos.y][nextstate.pos.x] in ['0', '4', '5', '6']:
+                continue
+
+            if nextstate.board_height[nextstate.pos.y][nextstate.pos.x] > max_next_height:
                 continue
 
             if nextstate.board_type[nextstate.pos.y][nextstate.pos.x] in ['3', 'w']:
