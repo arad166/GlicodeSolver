@@ -17,15 +17,14 @@ class State:
         return isinstance(other, State) and (
             self.pos.y == other.pos.y and
             self.pos.x == other.pos.x and
-            self.board_type == other.board_type and
-            self.board_height == other.board_height
+            self.board_height == other.board_height and
+            self.visited_friends == other.visited_friends
         )
 
     def __hash__(self):
         return hash((
             self.pos.y,
             self.pos.x,
-            tuple(tuple(row) for row in self.board_type),
             tuple(tuple(row) for row in self.board_height),
             tuple(tuple(row) for row in self.visited_friends)
         ))
@@ -68,17 +67,11 @@ def findPath(board_type, board_height):
     dx = [1, 0, -1, 0]
     dir = ['R', 'D', 'L', 'U']
 
-    visited = set()
-
+    visited = set([start])
     que = deque([start])
 
     while len(que) > 0:
         nowstate = que.popleft()
-
-        if nowstate in visited:
-            continue
-
-        visited.add(nowstate)
 
         # 全ての友達の元に行ったら終了
         if check_all_friends(nowstate):
@@ -89,8 +82,9 @@ def findPath(board_type, board_height):
         for d in range(4):
             nextstate = nowstate.copy()
             max_next_height = nextstate.board_height[nextstate.pos.y][nextstate.pos.x]
+            pushed = False
 
-            if nextstate.board_type[nowpos.y][nowpos.x] in ['1', '3', '7', 'd', 'e', 'f', 'g', 'h', 'i', 'w']:
+            if nextstate.board_type[nowpos.y][nowpos.x] in ['1', '3', '7', 'd', 'e', 'f', 'g', 'h', 'i', 'q', 'r', 's', 't', 'u', 'w']:
                 nextstate.pos.y = nowpos.y + dy[d]
                 nextstate.pos.x = nowpos.x + dx[d]
 
@@ -105,6 +99,25 @@ def findPath(board_type, board_height):
             if nextstate.pos.y < 0 or nextstate.pos.y >= height or nextstate.pos.x < 0 or nextstate.pos.x >= width:
                 continue
 
+            if nextstate.board_type[nextstate.pos.y][nextstate.pos.x] in ['q', 'r', 's', 't', 'u']:
+                for y in range(height):
+                    for x in range(width):
+                        if y == nextstate.pos.y and x == nextstate.pos.x:
+                            continue
+                        if nextstate.board_type[y][x] == nextstate.board_type[nextstate.pos.y][nextstate.pos.x]:
+                            #print(y, x, nextstate.board_type[y][x], nextstate.pos.y, nextstate.pos.x, nextstate.board_type[nextstate.pos.y][nextstate.pos.x])
+                            nextstate2 = nextstate.copy()
+                            nextstate2.pos.y = y
+                            nextstate2.pos.x = x
+                            if nextstate2 not in visited:
+                                nextstate2.operations.append(dir[d])
+                                que.append(nextstate2)
+                                visited.add(nextstate2)
+                                pushed = True
+            
+            if pushed:
+                continue
+
             if nextstate.board_type[nextstate.pos.y][nextstate.pos.x] in ['0', '4', '5', '6']:
                 continue
 
@@ -114,8 +127,10 @@ def findPath(board_type, board_height):
             if nextstate.board_type[nextstate.pos.y][nextstate.pos.x] in ['3', 'w']:
                 nextstate.visited_friends[nextstate.pos.y][nextstate.pos.x] = True
             
-            nextstate.operations.append(dir[d])
-            que.append(nextstate)
+            if nextstate not in visited:
+                nextstate.operations.append(dir[d])
+                visited.add(nextstate)
+                que.append(nextstate)
         
     print("No path found")
     return []
