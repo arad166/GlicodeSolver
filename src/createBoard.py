@@ -24,8 +24,12 @@ def createBoard(qr_data):
     for i in range(h):
         for j in range(w):
             board_type[i][j] = s_qr[i*w*2+j*2]
-            board_height[i][j] = s_qr[i*w*2+j*2+1]
-    
+            board_height[i][j] = int(s_qr[i*w*2+j*2+1])
+            if board_type[i][j] == 'e':
+                board_height[i][j] += 1
+            if board_type[i][j] == 'h':
+                board_height[i][j] += 1
+
     return board_type, board_height
 
     
