@@ -60,6 +60,7 @@ def findPath(board_type, board_height):
         for x in range(width):
             if board_type[y][x] == '2':
                 startpos = Pos(y, x)
+                board_type[y][x] = '1'
 
     start = State(startpos, board_type, board_height)
 
@@ -85,8 +86,10 @@ def findPath(board_type, board_height):
 
         for d in range(4):
             nextstate = nowstate.copy()
-            nextstate.pos.y = nowstate.pos.y + dy[d]
-            nextstate.pos.x = nowstate.pos.x + dx[d]
+
+            if nextstate.board_type[nextstate.pos.y][nextstate.pos.x] in ['1', '3', 'd', 'e', 'f', 'g', 'h', 'i', 'w']:
+                nextstate.pos.y = nowstate.pos.y + dy[d]
+                nextstate.pos.x = nowstate.pos.x + dx[d]
 
             if nextstate.pos.y < 0 or nextstate.pos.y >= height or nextstate.pos.x < 0 or nextstate.pos.x >= width:
                 continue
@@ -94,17 +97,14 @@ def findPath(board_type, board_height):
             if nextstate.board_type[nextstate.pos.y][nextstate.pos.x] in ['0', '4', '5', '6']:
                 continue
 
-            if nextstate.board_height[nextstate.pos.y][nextstate.pos.x] > nowstate.board_height[nowstate.pos.y][nowstate.pos.x]:
-                continue
-
-            if nextstate.board_type[nextstate.pos.y][nextstate.pos.x] == '3' or nextstate.board_type[nextstate.pos.y][nextstate.pos.x] == 'w':
+            if nextstate.board_type[nextstate.pos.y][nextstate.pos.x] in ['3', 'w']:
                 nextstate.visited_friends[nextstate.pos.y][nextstate.pos.x] = True
             
             nextstate.operations.append(dir[d])
             que.append(nextstate)
         
-
-
+    print("No path found")
+    return []
 
 
         
